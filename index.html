@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio — Dev</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --acid: #b9ff4b;
+      --acid-dim: #8fcc2a;
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --border: #1e1e1e;
+      --muted: #555;
+      --text: #e8e8e8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* Custom cursor */
+    .cursor {
+      position: fixed;
+      width: 12px;
+      height: 12px;
+      background: var(--acid);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s, width 0.3s, height 0.3s, background 0.3s;
+      mix-blend-mode: difference;
+    }
+    .cursor-ring {
+      position: fixed;
+      width: 40px;
+      height: 40px;
+      border: 1px solid var(--acid);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: all 0.15s ease;
+      opacity: 0.5;
+    }
+
+    /* Grain overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.03;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    /* Marquee */
+    .marquee-track {
+      display: flex;
+      width: max-content;
+      animation: marquee 18s linear infinite;
+    }
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    /* Reveal animations */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s cubic-bezier(.16,1,.3,1), transform 0.8s cubic-bezier(.16,1,.3,1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* Hover glow on cards */
+    .project-card {
+      position: relative;
+      overflow: hidden;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      transition: border-color 0.3s, transform 0.4s cubic-bezier(.16,1,.3,1);
+    }
+    .project-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(400px circle at var(--mx,50%) var(--my,50%), rgba(185,255,75,0.07), transparent 60%);
+      opacity: 0;
+      transition: opacity 0.4s;
+      pointer-events: none;
+    }
+    .project-card:hover::before { opacity: 1; }
+    .project-card:hover {
+      border-color: rgba(185,255,75,0.3);
+      transform: translateY(-4px);
+    }
+
+    /* Acid accent text */
+    .acid { color: var(--acid); }
+    .acid-bg { background: var(--acid); color: #0a0a0a; }
+
+    /* Nav */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 500;
+      backdrop-filter: blur(16px);
+      background: rgba(10,10,10,0.8);
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Hero big text */
+    .hero-title {
+      font-size: clamp(3.5rem, 10vw, 9rem);
+      font-weight: 800;
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+    }
+
+    /* Skill pill */
+    .skill-pill {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      padding: 0.35rem 0.85rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--muted);
+      transition: border-color 0.3s, color 0.3s;
+    }
+    .skill-pill:hover { border-color: var(--acid); color: var(--acid); }
+
+    /* Mono label */
+    .mono {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* Section line */
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 3rem;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* Big number */
+    .big-num {
+      font-size: clamp(4rem, 8vw, 7rem);
+      font-weight: 800;
+      color: var(--acid);
+      line-height: 1;
+    }
+
+    /* Hover link arrow */
+    .link-arrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem;
+      letter-spacing: 0.06em;
+      color: var(--acid);
+      text-decoration: none;
+      transition: gap 0.3s;
+    }
+    .link-arrow:hover { gap: 0.8rem; }
+
+    /* Contact input */
+    input, textarea {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      width: 100%;
+      padding: 1rem 1.25rem;
+      border-radius: 4px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    input:focus, textarea:focus { border-color: var(--acid); }
+    input::placeholder, textarea::placeholder { color: var(--muted); }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* Tag badge */
+    .tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      padding: 0.2rem 0.6rem;
+      background: rgba(185,255,75,0.1);
+      color: var(--acid);
+      border-radius: 3px;
+    }
+
+    /* Image placeholder shimmer */
+    .img-placeholder {
+      background: linear-gradient(135deg, #161616 0%, #1a1a1a 50%, #161616 100%);
+      background-size: 200% 200%;
+      animation: shimmer 3s ease infinite;
+    }
+    @keyframes shimmer {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Timeline line */
+    .timeline { position: relative; }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 8px; bottom: 8px;
+      width: 1px;
+      background: linear-gradient(to bottom, var(--acid), transparent);
+    }
+
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in-down { animation: fadeInDown 0.9s cubic-bezier(.16,1,.3,1) both; }
+    .delay-1 { animation-delay: 0.15s; }
+    .delay-2 { animation-delay: 0.3s; }
+    .delay-3 { animation-delay: 0.45s; }
+    .delay-4 { animation-delay: 0.6s; }
+
+    @media (max-width: 640px) {
+      body { cursor: auto; }
+      .cursor, .cursor-ring { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cursor -->
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- ──────── NAV ──────── -->
+  <nav>
+    <div class="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
+      <span class="mono acid">jcdejesus.dev</span>
+      <div class="flex items-center gap-8">
+        <a href="#proyectos" class="mono hover:text-white transition-colors hidden sm:block">Proyectos</a>
+        <a href="#sobre-mi" class="mono hover:text-white transition-colors hidden sm:block">Sobre mí</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ──────── HERO ──────── -->
+  <section class="min-h-screen flex flex-col justify-center pt-14 px-6 max-w-7xl mx-auto">
+    <div class="max-w-5xl">
+      <div class="mono mb-6 fade-in-down">
+        <span class="acid">■</span> &nbsp;Disponible para proyectos — 2025
+      </div>
+
+      <h1 class="hero-title fade-in-down delay-1">
+        Diseño &amp;<br />
+        <span class="acid">Desarrollo</span><br />
+        Web.
+      </h1>
+
+      <p class="mt-8 text-lg text-gray-400 max-w-xl leading-relaxed fade-in-down delay-2">
+        Full-Stack Developer con experiencia en React, Angular, Node.js, Django y Spring Boot. Proyectos personales y escolares. También manejo <span style="color:var(--acid)">QA con Jira</span>.
+      </p>
+
+      <div class="mt-10 flex flex-wrap gap-4 fade-in-down delay-3">
+        <a href="#proyectos" class="acid-bg px-6 py-3 rounded font-bold text-sm tracking-wider hover:opacity-90 transition-opacity">
+          Ver proyectos →
+        </a>
+        <a href="#contacto" class="px-6 py-3 rounded border border-gray-700 text-sm font-semibold hover:border-gray-400 transition-colors">
+          Hablemos
+        </a>
+      </div>
+
+
+    </div>
+
+    <!-- Scroll indicator -->
+    <div class="absolute bottom-8 right-8 flex flex-col items-center gap-2 mono hidden lg:flex">
+      <div style="width:1px;height:60px;background:linear-gradient(to bottom,var(--acid),transparent);"></div>
+      scroll
+    </div>
+  </section>
+
+  <!-- ──────── MARQUEE ──────── -->
+  <div class="overflow-hidden border-y border-gray-800 py-3 my-8">
+    <div class="marquee-track">
+      <span class="mono px-8 opacity-40">React</span><span class="mono px-2 acid">✦</span>
+      <span class="mono px-8 opacity-40">Angular</span><span class="mono px-2 acid">✦</span>
+      <span class="mono px-8 opacity-40">HTML Vanilla</span><span class="mono px-2 acid">✦</span>
+      <span class="mono px-8 opacity-40">Node.js</span><span class="mono px-2 acid">✦</span>
+      <span class="mono px-8 opacity-40">Express</span><span class="mono px-2 acid">✦</span>
+      <span class="mono px-8 opacity-40">Django</span><span class="mono px-2 acid">✦</span>
+      <span class="mono px-8 opacity-40">Spring Boot</span><span class="mono px-2 acid">✦</span>
+      <span class="mono px-8 opacity-40">Python</span><span class="mono px-2 acid">✦</span>
+      <!-- duplicate -->
+      <span class="mono px-8 opacity-40">React</span><span class="mono px-2 acid">✦</span>
+      <span class="mono px-8 opacity-40">Angular</span><span class="mono px-2 acid">✦</span>
+      <span class="mono px-8 opacity-40">HTML Vanilla</span><span class="mono px-2 acid">✦</span>
+      <span class="mono px-8 opacity-40">Node.js</span><span class="mono px-2 acid">✦</span>
+      <span class="mono px-8 opacity-40">Express</span><span class="mono px-2 acid">✦</span>
+      <span class="mono px-8 opacity-40">Django</span><span class="mono px-2 acid">✦</span>
+      <span class="mono px-8 opacity-40">Spring Boot</span><span class="mono px-2 acid">✦</span>
+      <span class="mono px-8 opacity-40">Python</span><span class="mono px-2 acid">✦</span>
+    </div>
+  </div>
+
+  <!-- ──────── PROYECTOS ──────── -->
+  <section id="proyectos" class="max-w-7xl mx-auto px-6 py-24">
+    <div class="section-label reveal">
+      <span class="mono acid">01</span>
+      <span class="mono">Proyectos</span>
+    </div>
+
+    <h2 class="text-4xl sm:text-5xl font-bold mb-16 reveal" style="letter-spacing:-0.02em">
+      Trabajo <span class="acid">seleccionado</span>
+    </h2>
+
+    <!-- Featured project: Trinoflow -->
+    <div class="project-card rounded-lg mb-6 reveal" onmousemove="trackMouse(event,this)">
+      <div class="grid lg:grid-cols-2 gap-0">
+        <img
+          src="https://api.microlink.io/?url=https://trello-app-frontend-seven.vercel.app/&screenshot=true&meta=false&embed=screenshot.url"
+          alt="Preview Trinoflow"
+          class="w-full aspect-video lg:aspect-auto min-h-64 object-cover rounded-tl-lg rounded-bl-lg"
+          onerror="this.classList.add('img-placeholder'); this.removeAttribute('src')"
+        />
+        <div class="p-8 lg:p-12 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-3 mb-4">
+              <span class="tag">Destacado</span>
+              <span class="mono">2025</span>
+            </div>
+            <h3 class="text-2xl sm:text-3xl font-bold mb-4" style="letter-spacing:-0.02em">Trinoflow</h3>
+            <p class="text-gray-400 leading-relaxed mb-6">
+              Aplicación de gestión de tareas estilo Trello. Tableros con columnas personalizables, tarjetas drag & drop y flujos de trabajo colaborativos en tiempo real.
+            </p>
+            <div class="flex flex-wrap gap-2 mb-8">
+              <span class="skill-pill">React</span>
+              <span class="skill-pill">Node.js</span>
+              <span class="skill-pill">Express</span>
+            </div>
+          </div>
+          <div class="flex gap-4">
+            <a href="https://trello-app-frontend-seven.vercel.app/" target="_blank" rel="noopener" class="link-arrow">Ver demo <span>→</span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grid de proyectos -->
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+      <!-- SistemaAsistencia -->
+      <div class="project-card rounded-lg reveal" onmousemove="trackMouse(event,this)">
+        <img
+          src="https://api.microlink.io/?url=https://nuevo-mike-5l2r-git-main-juabngonzalez4-gmailcoms-projects.vercel.app/&screenshot=true&meta=false&embed=screenshot.url"
+          alt="Preview SistemaAsistencia"
+          class="w-full aspect-video object-cover rounded-tl-lg rounded-tr-lg"
+          onerror="this.classList.add('img-placeholder'); this.removeAttribute('src')"
+        />
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-3">
+            <span class="tag">Gestión Escolar</span>
+            <span class="mono">2025</span>
+          </div>
+          <h3 class="text-xl font-bold mb-2">SistemaAsistencia</h3>
+          <p class="text-gray-500 text-sm leading-relaxed mb-4">
+            Sistema de gestión escolar con control de asistencia, administración de alumnos, grupos y reportes por periodo.
+          </p>
+          <div class="flex flex-wrap gap-1.5 mb-5">
+            <span class="skill-pill">Angular</span>
+            <span class="skill-pill">Node.js</span>
+            <span class="skill-pill">Express</span>
+          </div>
+          <a href="https://nuevo-mike-5l2r-git-main-juabngonzalez4-gmailcoms-projects.vercel.app/" target="_blank" rel="noopener" class="link-arrow">Ver proyecto →</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ──────── SOBRE MÍ ──────── -->
+  <section id="sobre-mi" class="max-w-7xl mx-auto px-6 py-24">
+    <div class="section-label reveal">
+      <span class="mono acid">02</span>
+      <span class="mono">Sobre mí</span>
+    </div>
+
+    <div class="grid lg:grid-cols-2 gap-16 items-start">
+      <div>
+        <h2 class="text-4xl sm:text-5xl font-bold mb-8 reveal" style="letter-spacing:-0.02em">
+          Hola, soy<br /><span class="acid">Juan Carlos</span><br />González López
+        </h2>
+        <p class="text-gray-400 leading-relaxed mb-6 reveal">
+          Desarrollador Full-Stack con experiencia construyendo proyectos personales y escolares. Domino el ciclo completo — del frontend al backend — con enfoque práctico adquirido en entorno académico.
+        </p>
+        <p class="text-gray-400 leading-relaxed mb-8 reveal">
+          Soy de Los Mochis, Sinaloa. Además del desarrollo, tengo experiencia en <span style="color:var(--acid)">QA</span> gestionando pruebas y reportes de bugs con Jira. Me apasiona escribir código limpio y seguir creciendo como desarrollador.
+        </p>
+
+        <!-- Timeline / Experience -->
+        <div class="timeline pl-6 space-y-8 reveal">
+          <div>
+            <div class="mono acid mb-1">Proyectos Personales</div>
+            <div class="font-semibold">Full-Stack Developer</div>
+            <div class="text-gray-500 text-sm mt-1">Desarrollo de aplicaciones completas: Trinoflow (gestión de tareas) y SistemaAsistencia (gestión escolar).</div>
+          </div>
+          <div>
+            <div class="mono acid mb-1">QA</div>
+            <div class="font-semibold">Quality Assurance con Jira</div>
+            <div class="text-gray-500 text-sm mt-1">Gestión de casos de prueba, reporte y seguimiento de bugs usando Jira en proyectos del equipo.</div>
+          </div>
+          <div>
+            <div class="mono acid mb-1">Formación</div>
+            <div class="font-semibold">Ingeniería / Desarrollo de Software</div>
+            <div class="text-gray-500 text-sm mt-1">Base sólida en algoritmos, bases de datos, arquitectura de software y desarrollo web.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <!-- Skill groups -->
+        <div class="mb-10">
+          <div class="mono mb-4">Frontend</div>
+          <div class="flex flex-wrap gap-2">
+            <span class="skill-pill">HTML / CSS</span>
+            <span class="skill-pill">JavaScript</span>
+            <span class="skill-pill">React</span>
+            <span class="skill-pill">Angular</span>
+            <span class="skill-pill">Tailwind CSS</span>
+          </div>
+        </div>
+        <div class="mb-10">
+          <div class="mono mb-4">Backend</div>
+          <div class="flex flex-wrap gap-2">
+            <span class="skill-pill">Node.js</span>
+            <span class="skill-pill">Express</span>
+            <span class="skill-pill">Django</span>
+            <span class="skill-pill">Spring Boot</span>
+            <span class="skill-pill">REST APIs</span>
+          </div>
+        </div>
+        <div>
+          <div class="mono mb-4">Herramientas</div>
+          <div class="flex flex-wrap gap-2">
+            <span class="skill-pill">Git</span>
+            <span class="skill-pill">Docker</span>
+            <span class="skill-pill">Python</span>
+            <span class="skill-pill">Java</span>
+            <span class="skill-pill">Jira</span>
+            <span class="skill-pill">QA Testing</span>
+          </div>
+        </div>
+
+        <!-- Download CV -->
+        <div class="mt-10 p-5 border border-gray-800 rounded-lg flex items-center justify-between">
+          <div>
+            <div class="font-semibold">Currículum Vitae</div>
+            <div class="text-gray-500 text-sm mt-0.5">PDF · Actualizado 2025</div>
+          </div>
+          <a href="#" class="acid-bg px-4 py-2 rounded text-xs font-bold tracking-wider hover:opacity-90 transition-opacity">
+            Descargar
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ──────── SERVICES ──────── -->
+  <section class="max-w-7xl mx-auto px-6 py-16">
+    <div class="section-label reveal">
+      <span class="mono acid">03</span>
+      <span class="mono">Servicios</span>
+    </div>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+      <div class="project-card p-8 rounded-lg reveal" onmousemove="trackMouse(event,this)">
+        <div class="text-3xl mb-4">⬡</div>
+        <h3 class="text-xl font-bold mb-3">Desarrollo Frontend</h3>
+        <p class="text-gray-500 leading-relaxed text-sm">Interfaces modernas con React, Angular o HTML Vanilla. Rápidas, responsivas y con excelente UX.</p>
+      </div>
+
+      <div class="project-card p-8 rounded-lg reveal" onmousemove="trackMouse(event,this)">
+        <div class="text-3xl mb-4">◈</div>
+        <h3 class="text-xl font-bold mb-3">APIs & Backend</h3>
+        <p class="text-gray-500 leading-relaxed text-sm">Backends robustos con Node/Express, Django o Spring Boot. Arquitecturas limpias y bien documentadas.</p>
+      </div>
+
+      <div class="project-card p-8 rounded-lg reveal" onmousemove="trackMouse(event,this)">
+        <div class="text-3xl mb-4">◎</div>
+        <h3 class="text-xl font-bold mb-3">Aplicaciones Full-Stack</h3>
+        <p class="text-gray-500 leading-relaxed text-sm">Desarrollo end-to-end: desde la base de datos hasta la interfaz. Un solo desarrollador, producto completo.</p>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ──────── FOOTER ──────── -->
+  <footer class="border-t border-gray-800 px-6 py-8">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <span class="mono opacity-40">© 2025 Juan Carlos González López. Diseñado & construido con ☕</span>
+      <span class="mono opacity-40">Los Mochis, México</span>
+    </div>
+  </footer>
+
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    // ── Custom cursor ──
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let rx = 0, ry = 0;
+
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+      setTimeout(() => {
+        ring.style.left = e.clientX + 'px';
+        ring.style.top = e.clientY + 'px';
+      }, 60);
+    });
+
+    document.querySelectorAll('a, button, input, textarea').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cursor.style.width = '20px';
+        cursor.style.height = '20px';
+        ring.style.width = '60px';
+        ring.style.height = '60px';
+      });
+      el.addEventListener('mouseleave', () => {
+        cursor.style.width = '12px';
+        cursor.style.height = '12px';
+        ring.style.width = '40px';
+        ring.style.height = '40px';
+      });
+    });
+
+    // ── Mouse glow on cards ──
+    function trackMouse(e, el) {
+      const r = el.getBoundingClientRect();
+      el.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+      el.style.setProperty('--my', (e.clientY - r.top) + 'px');
+    }
+
+    // ── Scroll reveal ──
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('visible'), i * 80);
+          obs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+    // Form submit
+    function handleSubmit(e) {
+      e.preventDefault();
+      const msg = document.getElementById('form-msg');
+      msg.classList.remove('hidden');
+      e.target.reset();
+      setTimeout(() => msg.classList.add('hidden'), 5000);
+    }
+
+    // Active nav highlight
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('nav a[href^="#"]');
+    const navObs = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          navLinks.forEach(link => {
+            link.style.color = link.getAttribute('href') === '#' + entry.target.id ? 'var(--acid)' : '';
+          });
+        }
+      });
+    }, { rootMargin: '-40% 0px -55% 0px' });
+    sections.forEach(s => navObs.observe(s));
+
+    // Parallax hero
+    const heroTitle = document.querySelector('.hero-title');
+    window.addEventListener('scroll', () => {
+      if (heroTitle) {
+        const y = window.scrollY;
+        heroTitle.style.transform = 'translateY(' + (y * 0.18) + 'px)';
+        heroTitle.style.opacity = Math.max(0, 1 - y / 500);
+      }
+    }, { passive: true });
+  </script>
+</body>
+</html>
