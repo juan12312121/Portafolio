@@ -10,615 +10,525 @@
   <style>
     :root {
       --acid: #b9ff4b;
-      --acid-dim: #8fcc2a;
       --bg: #0a0a0a;
       --surface: #111111;
+      --surface2: #161616;
       --border: #1e1e1e;
       --muted: #555;
       --text: #e8e8e8;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; overflow-x: hidden; cursor: none; }
 
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Syne', sans-serif;
-      overflow-x: hidden;
-      cursor: none;
+    .cursor { position:fixed;width:10px;height:10px;background:var(--acid);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .3s,height .3s;mix-blend-mode:difference; }
+    .cursor-ring { position:fixed;width:36px;height:36px;border:1px solid var(--acid);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .15s ease;opacity:.4; }
+
+    body::before { content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:.03;pointer-events:none;z-index:1000; }
+
+    .marquee-track { display:flex;width:max-content;animation:marquee 20s linear infinite; }
+    @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+    .reveal { opacity:0;transform:translateY(28px);transition:opacity .75s cubic-bezier(.16,1,.3,1),transform .75s cubic-bezier(.16,1,.3,1); }
+    .reveal.visible { opacity:1;transform:none; }
+
+    @keyframes fid { from{opacity:0;transform:translateY(-14px)} to{opacity:1;transform:none} }
+    .fid { animation:fid .9s cubic-bezier(.16,1,.3,1) both; }
+    .d1{animation-delay:.15s} .d2{animation-delay:.3s} .d3{animation-delay:.45s}
+
+    nav { position:fixed;top:0;left:0;right:0;z-index:500;backdrop-filter:blur(16px);background:rgba(10,10,10,.88);border-bottom:1px solid var(--border); }
+
+    .mono { font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted); }
+    .acid { color:var(--acid); }
+    .acid-bg { background:var(--acid);color:#0a0a0a; }
+    .hero-title { font-size:clamp(3.5rem,10vw,9rem);font-weight:800;line-height:.92;letter-spacing:-.03em; }
+
+    .section-label { display:flex;align-items:center;gap:1rem;margin-bottom:2.5rem; }
+    .section-label::after { content:'';flex:1;height:1px;background:var(--border); }
+
+    .skill-pill { font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.07em;padding:.24rem .68rem;border:1px solid var(--border);border-radius:999px;color:var(--muted);transition:border-color .25s,color .25s;white-space:nowrap; }
+    .skill-pill:hover { border-color:var(--acid);color:var(--acid); }
+
+    .tag { font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.08em;padding:.15rem .5rem;background:rgba(185,255,75,.1);color:var(--acid);border-radius:3px; }
+
+    .link-arrow { display:inline-flex;align-items:center;gap:.4rem;font-family:'DM Mono',monospace;font-size:.74rem;letter-spacing:.06em;color:var(--acid);text-decoration:none;transition:gap .3s; }
+    .link-arrow:hover { gap:.85rem; }
+
+    ::-webkit-scrollbar{width:3px} ::-webkit-scrollbar-track{background:var(--bg)} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+    .timeline{position:relative}
+    .timeline::before{content:'';position:absolute;left:0;top:8px;bottom:8px;width:1px;background:linear-gradient(to bottom,var(--acid),transparent)}
+
+    @media(max-width:640px){body{cursor:auto}.cursor,.cursor-ring{display:none}}
+
+    /* ═══════════════════════════════════
+       PROJECT GRID SYSTEM
+    ═══════════════════════════════════ */
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      border: none;
+      border-radius: 20px;
+      overflow: visible;
+    }
+    @media(max-width:900px) { .projects-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media(max-width:560px) { .projects-grid { grid-template-columns: 1fr; } }
+
+    /* divider between cards */
+    .projects-grid > * + * { border-left: none; }
+    @media(max-width:900px) {
+      .projects-grid > *:nth-child(2n+1) { border-left: none; }
+      .projects-grid > *:nth-child(n+3) { border-top: none; }
+    }
+    @media(max-width:560px) {
+      .projects-grid > * + * { border-left: none; border-top: none; }
     }
 
-    /* Custom cursor */
-    .cursor {
-      position: fixed;
-      width: 12px;
-      height: 12px;
-      background: var(--acid);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9999;
-      transform: translate(-50%, -50%);
-      transition: transform 0.1s, width 0.3s, height 0.3s, background 0.3s;
-      mix-blend-mode: difference;
-    }
-    .cursor-ring {
-      position: fixed;
-      width: 40px;
-      height: 40px;
-      border: 1px solid var(--acid);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9998;
-      transform: translate(-50%, -50%);
-      transition: all 0.15s ease;
-      opacity: 0.5;
-    }
-
-    /* Grain overlay */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
-      opacity: 0.03;
-      pointer-events: none;
-      z-index: 1000;
-    }
-
-    /* Marquee */
-    .marquee-track {
-      display: flex;
-      width: max-content;
-      animation: marquee 18s linear infinite;
-    }
-    @keyframes marquee {
-      from { transform: translateX(0); }
-      to { transform: translateX(-50%); }
-    }
-
-    /* Reveal animations */
-    .reveal {
-      opacity: 0;
-      transform: translateY(40px);
-      transition: opacity 0.8s cubic-bezier(.16,1,.3,1), transform 0.8s cubic-bezier(.16,1,.3,1);
-    }
-    .reveal.visible {
-      opacity: 1;
-      transform: none;
-    }
-
-    /* Hover glow on cards */
-    .project-card {
+    .pcard {
       position: relative;
-      overflow: hidden;
       background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      transition: background .35s;
+      overflow: hidden;
       border: 1px solid var(--border);
-      transition: border-color 0.3s, transform 0.4s cubic-bezier(.16,1,.3,1);
+      border-radius: 12px;
     }
-    .project-card::before {
+    .pcard:hover { background: var(--surface2); }
+
+    /* glow follow mouse */
+    .pcard::before {
       content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(400px circle at var(--mx,50%) var(--my,50%), rgba(185,255,75,0.07), transparent 60%);
-      opacity: 0;
-      transition: opacity 0.4s;
+      position: absolute; inset: 0; pointer-events: none; z-index: 0;
+      background: radial-gradient(280px circle at var(--mx,50%) var(--my,50%), rgba(185,255,75,.055), transparent 65%);
+      opacity: 0; transition: opacity .4s;
+    }
+    .pcard:hover::before { opacity: 1; }
+
+    /* browser mockup */
+    .pcard-browser {
+      position: relative;
+      background: #0c0c0c;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .browser-chrome {
+      height: 28px;
+      display: flex; align-items: center; padding: 0 10px; gap: 5px;
+      background: #0e0e0e;
+      border-bottom: 1px solid rgba(255,255,255,.04);
+    }
+    .bdot { width: 8px; height: 8px; border-radius: 50%; flex-shrink:0; }
+    .bdot-r{background:#ff5f57}.bdot-y{background:#febc2e}.bdot-g{background:#28c840}
+    .burl {
+      flex: 1; height: 14px; background: rgba(255,255,255,.04); border-radius: 3px;
+      margin: 0 7px; padding: 0 7px;
+      display: flex; align-items: center;
+      font-family: 'DM Mono', monospace; font-size: 8px; color: #333;
+      overflow: hidden; white-space: nowrap;
+    }
+
+    .pcard-img-wrap {
+      aspect-ratio: 16/9;
+      overflow: hidden;
+      position: relative;
+      background: #0d0d0d;
+    }
+    .pcard-img-wrap img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: top;
+      transition: transform .9s cubic-bezier(.16,1,.3,1), filter .5s;
+      filter: brightness(.75) saturate(.8);
+      display: block;
+    }
+    .pcard:hover .pcard-img-wrap img {
+      transform: scale(1.06);
+      filter: brightness(1) saturate(1.05);
+    }
+    .pcard-img-wrap::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, transparent 40%, rgba(10,10,10,.75));
       pointer-events: none;
     }
-    .project-card:hover::before { opacity: 1; }
-    .project-card:hover {
-      border-color: rgba(185,255,75,0.3);
-      transform: translateY(-4px);
-    }
 
-    /* Acid accent text */
-    .acid { color: var(--acid); }
-    .acid-bg { background: var(--acid); color: #0a0a0a; }
-
-    /* Nav */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 500;
-      backdrop-filter: blur(16px);
-      background: rgba(10,10,10,0.8);
-      border-bottom: 1px solid var(--border);
-    }
-
-    /* Hero big text */
-    .hero-title {
-      font-size: clamp(3.5rem, 10vw, 9rem);
-      font-weight: 800;
-      line-height: 0.95;
-      letter-spacing: -0.03em;
-    }
-
-    /* Skill pill */
-    .skill-pill {
+    /* number watermark */
+    .pcard-num {
+      position: absolute; bottom: 8px; right: 12px;
       font-family: 'DM Mono', monospace;
-      font-size: 0.72rem;
-      letter-spacing: 0.08em;
-      padding: 0.35rem 0.85rem;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      color: var(--muted);
-      transition: border-color 0.3s, color 0.3s;
-    }
-    .skill-pill:hover { border-color: var(--acid); color: var(--acid); }
-
-    /* Mono label */
-    .mono {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.75rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--muted);
+      font-size: 3.5rem; font-weight: 700; line-height: 1;
+      color: rgba(255,255,255,.07);
+      pointer-events: none; user-select: none; z-index: 1;
     }
 
-    /* Section line */
-    .section-label {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 3rem;
-    }
-    .section-label::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
-
-    /* Big number */
-    .big-num {
-      font-size: clamp(4rem, 8vw, 7rem);
-      font-weight: 800;
-      color: var(--acid);
-      line-height: 1;
-    }
-
-    /* Hover link arrow */
-    .link-arrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.78rem;
-      letter-spacing: 0.06em;
-      color: var(--acid);
-      text-decoration: none;
-      transition: gap 0.3s;
-    }
-    .link-arrow:hover { gap: 0.8rem; }
-
-    /* Contact input */
-    input, textarea {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--text);
-      font-family: 'Syne', sans-serif;
-      width: 100%;
-      padding: 1rem 1.25rem;
-      border-radius: 4px;
-      outline: none;
-      transition: border-color 0.3s;
-    }
-    input:focus, textarea:focus { border-color: var(--acid); }
-    input::placeholder, textarea::placeholder { color: var(--muted); }
-
-    /* Scrollbar */
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-    /* Tag badge */
-    .tag {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.08em;
-      padding: 0.2rem 0.6rem;
-      background: rgba(185,255,75,0.1);
-      color: var(--acid);
-      border-radius: 3px;
-    }
-
-    /* Image placeholder shimmer */
-    .img-placeholder {
-      background: linear-gradient(135deg, #161616 0%, #1a1a1a 50%, #161616 100%);
+    /* shimmer fallback */
+    .img-fallback {
+      width: 100%; height: 100%;
+      background: linear-gradient(135deg, #131313 0%, #1d1d1d 50%, #131313 100%);
       background-size: 200% 200%;
-      animation: shimmer 3s ease infinite;
+      animation: sh 3s ease infinite;
+      display: flex; align-items: center; justify-content: center;
     }
-    @keyframes shimmer {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+    @keyframes sh{0%{background-position:0 50%}50%{background-position:100% 50%}100%{background-position:0 50%}}
+
+    .pcard-body {
+      padding: 20px 22px 24px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative; z-index: 1;
     }
 
-    /* Timeline line */
-    .timeline { position: relative; }
-    .timeline::before {
-      content: '';
-      position: absolute;
-      left: 0; top: 8px; bottom: 8px;
-      width: 1px;
-      background: linear-gradient(to bottom, var(--acid), transparent);
+    .pcard-top { display:flex;align-items:center;gap:8px;margin-bottom:12px; }
+
+    .live-dot {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-family: 'DM Mono', monospace; font-size: .58rem; letter-spacing: .05em;
+      color: var(--acid); padding: .15rem .45rem;
+      background: rgba(185,255,75,.08); border-radius: 99px;
+      border: 1px solid rgba(185,255,75,.15);
+    }
+    .live-dot::before {
+      content: ''; width: 5px; height: 5px; border-radius: 50%;
+      background: var(--acid); animation: pulse 2s ease infinite;
+    }
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.75)}}
+
+    .pcard-title {
+      font-size: 1.35rem; font-weight: 800;
+      letter-spacing: -.02em; line-height: 1.1;
+      margin-bottom: 8px;
+    }
+    .pcard-desc {
+      font-size: .855rem; color: #666; line-height: 1.7;
+      flex: 1; margin-bottom: 16px;
+    }
+    .pcard-stack { display:flex;flex-wrap:wrap;gap:5px;margin-bottom:18px; }
+    .pcard-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      margin-top: auto;
     }
 
-    @keyframes fadeInDown {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .fade-in-down { animation: fadeInDown 0.9s cubic-bezier(.16,1,.3,1) both; }
-    .delay-1 { animation-delay: 0.15s; }
-    .delay-2 { animation-delay: 0.3s; }
-    .delay-3 { animation-delay: 0.45s; }
-    .delay-4 { animation-delay: 0.6s; }
+    /* about / services */
+    .about-grid { display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start; }
+    @media(max-width:768px){.about-grid{grid-template-columns:1fr}}
+    .srv-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:14px; }
+    @media(max-width:768px){.srv-grid{grid-template-columns:1fr}}
 
-    @media (max-width: 640px) {
-      body { cursor: auto; }
-      .cursor, .cursor-ring { display: none; }
+    .srv-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+      padding: 26px; transition: border-color .3s, transform .35s cubic-bezier(.16,1,.3,1);
     }
+    .srv-card:hover { border-color: rgba(185,255,75,.25); transform: translateY(-4px); }
+
+    input,textarea{background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:'Syne',sans-serif;width:100%;padding:1rem 1.25rem;border-radius:4px;outline:none;transition:border-color .3s}
+    input:focus,textarea:focus{border-color:var(--acid)}
+    input::placeholder,textarea::placeholder{color:var(--muted)}
   </style>
 </head>
 <body>
 
-  <!-- Cursor -->
   <div class="cursor" id="cursor"></div>
   <div class="cursor-ring" id="cursorRing"></div>
 
-  <!-- ──────── NAV ──────── -->
+  <!-- NAV -->
   <nav>
-    <div class="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
+    <div style="max-width:1280px;margin:0 auto;padding:0 24px;height:54px;display:flex;align-items:center;justify-content:space-between">
       <span class="mono acid">jcdejesus.dev</span>
-      <div class="flex items-center gap-8">
-        <a href="#proyectos" class="mono hover:text-white transition-colors hidden sm:block">Proyectos</a>
-        <a href="#sobre-mi" class="mono hover:text-white transition-colors hidden sm:block">Sobre mí</a>
+      <div style="display:flex;gap:28px">
+        <a href="#proyectos" class="mono" style="text-decoration:none;transition:color .2s" onmouseenter="this.style.color='#e8e8e8'" onmouseleave="this.style.color=''">Proyectos</a>
+        <a href="#sobre-mi" class="mono" style="text-decoration:none;transition:color .2s" onmouseenter="this.style.color='#e8e8e8'" onmouseleave="this.style.color=''">Sobre mí</a>
       </div>
     </div>
   </nav>
 
-  <!-- ──────── HERO ──────── -->
-  <section class="min-h-screen flex flex-col justify-center pt-14 px-6 max-w-7xl mx-auto">
-    <div class="max-w-5xl">
-      <div class="mono mb-6 fade-in-down">
-        <span class="acid">■</span> &nbsp;Disponible para proyectos — 2025
-      </div>
-
-      <h1 class="hero-title fade-in-down delay-1">
-        Diseño &amp;<br />
-        <span class="acid">Desarrollo</span><br />
-        Web.
-      </h1>
-
-      <p class="mt-8 text-lg text-gray-400 max-w-xl leading-relaxed fade-in-down delay-2">
-        Full-Stack Developer con experiencia en React, Angular, Node.js, Django y Spring Boot. Proyectos personales y escolares. También manejo <span style="color:var(--acid)">QA con Jira</span>.
+  <!-- HERO -->
+  <section style="min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:80px 24px 40px;max-width:1280px;margin:0 auto;position:relative">
+    <div style="max-width:920px">
+      <div class="mono fid" style="margin-bottom:22px"><span class="acid">■</span> &nbsp;Disponible para proyectos — 2025</div>
+      <h1 class="hero-title fid d1">Diseño &amp;<br /><span class="acid">Desarrollo</span><br />Web.</h1>
+      <p class="fid d2" style="margin-top:28px;font-size:1rem;color:#666;max-width:500px;line-height:1.8">
+        Full-Stack Developer. React, Angular, Node.js, Django, Spring Boot.<br/>También manejo <span class="acid">QA con Jira</span>.
       </p>
-
-      <div class="mt-10 flex flex-wrap gap-4 fade-in-down delay-3">
-        <a href="#proyectos" class="acid-bg px-6 py-3 rounded font-bold text-sm tracking-wider hover:opacity-90 transition-opacity">
-          Ver proyectos →
-        </a>
-        <a href="#contacto" class="px-6 py-3 rounded border border-gray-700 text-sm font-semibold hover:border-gray-400 transition-colors">
-          Hablemos
-        </a>
+      <div class="fid d3" style="margin-top:32px;display:flex;flex-wrap:wrap;gap:12px">
+        <a href="#proyectos" class="acid-bg" style="padding:13px 26px;border-radius:6px;font-weight:700;font-size:.82rem;letter-spacing:.07em;text-decoration:none">Ver proyectos →</a>
+        <a href="#sobre-mi" style="padding:13px 26px;border-radius:6px;border:1px solid #252525;font-size:.82rem;font-weight:600;text-decoration:none;color:var(--text);transition:border-color .2s" onmouseenter="this.style.borderColor='#444'" onmouseleave="this.style.borderColor='#252525'">Hablemos</a>
       </div>
-
-
     </div>
-
-    <!-- Scroll indicator -->
-    <div class="absolute bottom-8 right-8 flex flex-col items-center gap-2 mono hidden lg:flex">
-      <div style="width:1px;height:60px;background:linear-gradient(to bottom,var(--acid),transparent);"></div>
-      scroll
+    <div id="sc" style="position:absolute;bottom:28px;right:28px;display:flex;flex-direction:column;align-items:center;gap:7px;transition:opacity .4s">
+      <div style="width:1px;height:50px;background:linear-gradient(to bottom,var(--acid),transparent)"></div>
+      <span class="mono" style="font-size:.62rem">scroll</span>
     </div>
   </section>
 
-  <!-- ──────── MARQUEE ──────── -->
-  <div class="overflow-hidden border-y border-gray-800 py-3 my-8">
+  <!-- MARQUEE -->
+  <div style="overflow:hidden;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:9px 0">
     <div class="marquee-track">
-      <span class="mono px-8 opacity-40">React</span><span class="mono px-2 acid">✦</span>
-      <span class="mono px-8 opacity-40">Angular</span><span class="mono px-2 acid">✦</span>
-      <span class="mono px-8 opacity-40">HTML Vanilla</span><span class="mono px-2 acid">✦</span>
-      <span class="mono px-8 opacity-40">Node.js</span><span class="mono px-2 acid">✦</span>
-      <span class="mono px-8 opacity-40">Express</span><span class="mono px-2 acid">✦</span>
-      <span class="mono px-8 opacity-40">Django</span><span class="mono px-2 acid">✦</span>
-      <span class="mono px-8 opacity-40">Spring Boot</span><span class="mono px-2 acid">✦</span>
-      <span class="mono px-8 opacity-40">Python</span><span class="mono px-2 acid">✦</span>
-      <!-- duplicate -->
-      <span class="mono px-8 opacity-40">React</span><span class="mono px-2 acid">✦</span>
-      <span class="mono px-8 opacity-40">Angular</span><span class="mono px-2 acid">✦</span>
-      <span class="mono px-8 opacity-40">HTML Vanilla</span><span class="mono px-2 acid">✦</span>
-      <span class="mono px-8 opacity-40">Node.js</span><span class="mono px-2 acid">✦</span>
-      <span class="mono px-8 opacity-40">Express</span><span class="mono px-2 acid">✦</span>
-      <span class="mono px-8 opacity-40">Django</span><span class="mono px-2 acid">✦</span>
-      <span class="mono px-8 opacity-40">Spring Boot</span><span class="mono px-2 acid">✦</span>
-      <span class="mono px-8 opacity-40">Python</span><span class="mono px-2 acid">✦</span>
+      <span class="mono" style="padding:0 24px;opacity:.3">React</span><span class="mono acid" style="padding:0 4px">✦</span>
+      <span class="mono" style="padding:0 24px;opacity:.3">Angular</span><span class="mono acid" style="padding:0 4px">✦</span>
+      <span class="mono" style="padding:0 24px;opacity:.3">Node.js</span><span class="mono acid" style="padding:0 4px">✦</span>
+      <span class="mono" style="padding:0 24px;opacity:.3">Express</span><span class="mono acid" style="padding:0 4px">✦</span>
+      <span class="mono" style="padding:0 24px;opacity:.3">Django</span><span class="mono acid" style="padding:0 4px">✦</span>
+      <span class="mono" style="padding:0 24px;opacity:.3">Spring Boot</span><span class="mono acid" style="padding:0 4px">✦</span>
+      <span class="mono" style="padding:0 24px;opacity:.3">MySQL</span><span class="mono acid" style="padding:0 4px">✦</span>
+      <span class="mono" style="padding:0 24px;opacity:.3">Socket.io</span><span class="mono acid" style="padding:0 4px">✦</span>
+      <span class="mono" style="padding:0 24px;opacity:.3">Python</span><span class="mono acid" style="padding:0 4px">✦</span>
+      <span class="mono" style="padding:0 24px;opacity:.3">React</span><span class="mono acid" style="padding:0 4px">✦</span>
+      <span class="mono" style="padding:0 24px;opacity:.3">Angular</span><span class="mono acid" style="padding:0 4px">✦</span>
+      <span class="mono" style="padding:0 24px;opacity:.3">Node.js</span><span class="mono acid" style="padding:0 4px">✦</span>
+      <span class="mono" style="padding:0 24px;opacity:.3">Express</span><span class="mono acid" style="padding:0 4px">✦</span>
+      <span class="mono" style="padding:0 24px;opacity:.3">Django</span><span class="mono acid" style="padding:0 4px">✦</span>
+      <span class="mono" style="padding:0 24px;opacity:.3">Spring Boot</span><span class="mono acid" style="padding:0 4px">✦</span>
+      <span class="mono" style="padding:0 24px;opacity:.3">MySQL</span><span class="mono acid" style="padding:0 4px">✦</span>
+      <span class="mono" style="padding:0 24px;opacity:.3">Socket.io</span><span class="mono acid" style="padding:0 4px">✦</span>
+      <span class="mono" style="padding:0 24px;opacity:.3">Python</span><span class="mono acid" style="padding:0 4px">✦</span>
     </div>
   </div>
 
-  <!-- ──────── PROYECTOS ──────── -->
-  <section id="proyectos" class="max-w-7xl mx-auto px-6 py-24">
+  <!-- ═══ PROYECTOS ═══ -->
+  <section id="proyectos" style="max-width:1280px;margin:0 auto;padding:80px 24px">
+
     <div class="section-label reveal">
       <span class="mono acid">01</span>
       <span class="mono">Proyectos</span>
     </div>
 
-    <h2 class="text-4xl sm:text-5xl font-bold mb-16 reveal" style="letter-spacing:-0.02em">
-      Trabajo <span class="acid">seleccionado</span>
-    </h2>
-
-    <!-- Featured project: Trinoflow -->
-    <div class="project-card rounded-lg mb-6 reveal" onmousemove="trackMouse(event,this)">
-      <div class="grid lg:grid-cols-2 gap-0">
-        <img
-          src="https://api.microlink.io/?url=https://trello-app-frontend-seven.vercel.app/&screenshot=true&meta=false&embed=screenshot.url"
-          alt="Preview Trinoflow"
-          class="w-full aspect-video lg:aspect-auto min-h-64 object-cover rounded-tl-lg rounded-bl-lg"
-          onerror="this.classList.add('img-placeholder'); this.removeAttribute('src')"
-        />
-        <div class="p-8 lg:p-12 flex flex-col justify-between">
-          <div>
-            <div class="flex items-center gap-3 mb-4">
-              <span class="tag">Destacado</span>
-              <span class="mono">2025</span>
-            </div>
-            <h3 class="text-2xl sm:text-3xl font-bold mb-4" style="letter-spacing:-0.02em">Trinoflow</h3>
-            <p class="text-gray-400 leading-relaxed mb-6">
-              Aplicación de gestión de tareas estilo Trello. Tableros con columnas personalizables, tarjetas drag & drop y flujos de trabajo colaborativos en tiempo real.
-            </p>
-            <div class="flex flex-wrap gap-2 mb-8">
-              <span class="skill-pill">React</span>
-              <span class="skill-pill">Node.js</span>
-              <span class="skill-pill">Express</span>
-            </div>
-          </div>
-          <div class="flex gap-4">
-            <a href="https://trello-app-frontend-seven.vercel.app/" target="_blank" rel="noopener" class="link-arrow">Ver demo <span>→</span></a>
-          </div>
-        </div>
-      </div>
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:48px;flex-wrap:wrap;gap:16px" class="reveal">
+      <h2 style="font-size:clamp(2rem,5vw,3.8rem);font-weight:800;letter-spacing:-.025em;line-height:1.05">
+        Trabajo <span class="acid">seleccionado</span>
+      </h2>
+      <span class="mono" style="color:#333;padding-bottom:8px">3 proyectos en producción</span>
     </div>
 
-    <!-- Grid de proyectos -->
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <!-- ═══ THE 3-COLUMN GRID ═══ -->
+    <div class="projects-grid reveal">
 
-      <!-- SistemaAsistencia -->
-      <div class="project-card rounded-lg reveal" onmousemove="trackMouse(event,this)">
-        <img
-          src="https://api.microlink.io/?url=https://nuevo-mike-5l2r-git-main-juabngonzalez4-gmailcoms-projects.vercel.app/&screenshot=true&meta=false&embed=screenshot.url"
-          alt="Preview SistemaAsistencia"
-          class="w-full aspect-video object-cover rounded-tl-lg rounded-tr-lg"
-          onerror="this.classList.add('img-placeholder'); this.removeAttribute('src')"
-        />
-        <div class="p-6">
-          <div class="flex items-center justify-between mb-3">
-            <span class="tag">Gestión Escolar</span>
-            <span class="mono">2025</span>
+      <!-- ── 01 RedStudent ── -->
+      <div class="pcard" onmousemove="gm(event,this)">
+        <div class="pcard-browser">
+          <div class="browser-chrome">
+            <div class="bdot bdot-r"></div><div class="bdot bdot-y"></div><div class="bdot bdot-g"></div>
+            <div class="burl">computo-en-la-nube2-dusky.vercel.app</div>
           </div>
-          <h3 class="text-xl font-bold mb-2">SistemaAsistencia</h3>
-          <p class="text-gray-500 text-sm leading-relaxed mb-4">
-            Sistema de gestión escolar con control de asistencia, administración de alumnos, grupos y reportes por periodo.
-          </p>
-          <div class="flex flex-wrap gap-1.5 mb-5">
+          <div class="pcard-img-wrap">
+            <img
+              id="img-rs"
+              src="https://api.microlink.io/?url=https://computo-en-la-nube2-dusky.vercel.app/&screenshot=true&meta=false&embed=screenshot.url"
+              alt="RedStudent"
+              onerror="this.style.display='none';document.getElementById('fb-rs').style.display='flex'"
+            />
+            <div id="fb-rs" class="img-fallback" style="display:none">
+              <span class="mono" style="opacity:.2">preview</span>
+            </div>
+            <span class="pcard-num">01</span>
+          </div>
+        </div>
+        <div class="pcard-body">
+          <div class="pcard-top">
+            <span class="tag">Red Social</span>
+            <span class="live-dot">Live</span>
+          </div>
+          <h3 class="pcard-title">RedStudent</h3>
+          <p class="pcard-desc">Red social estudiantil full-stack. Posts, historias, chats en tiempo real, grupos, seguidores, notificaciones SSE y archivos.</p>
+          <div class="pcard-stack">
             <span class="skill-pill">Angular</span>
             <span class="skill-pill">Node.js</span>
-            <span class="skill-pill">Express</span>
+            <span class="skill-pill">MySQL</span>
+            <span class="skill-pill">Socket.io</span>
           </div>
-          <a href="https://nuevo-mike-5l2r-git-main-juabngonzalez4-gmailcoms-projects.vercel.app/" target="_blank" rel="noopener" class="link-arrow">Ver proyecto →</a>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ──────── SOBRE MÍ ──────── -->
-  <section id="sobre-mi" class="max-w-7xl mx-auto px-6 py-24">
-    <div class="section-label reveal">
-      <span class="mono acid">02</span>
-      <span class="mono">Sobre mí</span>
-    </div>
-
-    <div class="grid lg:grid-cols-2 gap-16 items-start">
-      <div>
-        <h2 class="text-4xl sm:text-5xl font-bold mb-8 reveal" style="letter-spacing:-0.02em">
-          Hola, soy<br /><span class="acid">Juan Carlos</span><br />González López
-        </h2>
-        <p class="text-gray-400 leading-relaxed mb-6 reveal">
-          Desarrollador Full-Stack con experiencia construyendo proyectos personales y escolares. Domino el ciclo completo — del frontend al backend — con enfoque práctico adquirido en entorno académico.
-        </p>
-        <p class="text-gray-400 leading-relaxed mb-8 reveal">
-          Soy de Los Mochis, Sinaloa. Además del desarrollo, tengo experiencia en <span style="color:var(--acid)">QA</span> gestionando pruebas y reportes de bugs con Jira. Me apasiona escribir código limpio y seguir creciendo como desarrollador.
-        </p>
-
-        <!-- Timeline / Experience -->
-        <div class="timeline pl-6 space-y-8 reveal">
-          <div>
-            <div class="mono acid mb-1">Proyectos Personales</div>
-            <div class="font-semibold">Full-Stack Developer</div>
-            <div class="text-gray-500 text-sm mt-1">Desarrollo de aplicaciones completas: Trinoflow (gestión de tareas) y SistemaAsistencia (gestión escolar).</div>
-          </div>
-          <div>
-            <div class="mono acid mb-1">QA</div>
-            <div class="font-semibold">Quality Assurance con Jira</div>
-            <div class="text-gray-500 text-sm mt-1">Gestión de casos de prueba, reporte y seguimiento de bugs usando Jira en proyectos del equipo.</div>
-          </div>
-          <div>
-            <div class="mono acid mb-1">Formación</div>
-            <div class="font-semibold">Ingeniería / Desarrollo de Software</div>
-            <div class="text-gray-500 text-sm mt-1">Base sólida en algoritmos, bases de datos, arquitectura de software y desarrollo web.</div>
+          <div class="pcard-footer">
+            <a href="https://computo-en-la-nube2-dusky.vercel.app/" target="_blank" rel="noopener" class="link-arrow">Ver demo →</a>
+            <span class="mono" style="color:#333">2025</span>
           </div>
         </div>
       </div>
 
-      <div class="reveal">
-        <!-- Skill groups -->
-        <div class="mb-10">
-          <div class="mono mb-4">Frontend</div>
-          <div class="flex flex-wrap gap-2">
-            <span class="skill-pill">HTML / CSS</span>
-            <span class="skill-pill">JavaScript</span>
+      <!-- ── 02 Trinoflow ── -->
+      <div class="pcard" onmousemove="gm(event,this)">
+        <div class="pcard-browser">
+          <div class="browser-chrome">
+            <div class="bdot bdot-r"></div><div class="bdot bdot-y"></div><div class="bdot bdot-g"></div>
+            <div class="burl">trello-app-frontend-seven.vercel.app</div>
+          </div>
+          <div class="pcard-img-wrap">
+            <img
+              id="img-tf"
+              src="https://api.microlink.io/?url=https://trello-app-frontend-seven.vercel.app/&screenshot=true&meta=false&embed=screenshot.url"
+              alt="Trinoflow"
+              onerror="this.style.display='none';document.getElementById('fb-tf').style.display='flex'"
+            />
+            <div id="fb-tf" class="img-fallback" style="display:none">
+              <span class="mono" style="opacity:.2">preview</span>
+            </div>
+            <span class="pcard-num">02</span>
+          </div>
+        </div>
+        <div class="pcard-body">
+          <div class="pcard-top">
+            <span class="tag">Gestión</span>
+            <span class="live-dot">Live</span>
+          </div>
+          <h3 class="pcard-title">Trinoflow</h3>
+          <p class="pcard-desc">Gestión de tareas estilo Trello. Tableros personalizables, tarjetas drag &amp; drop, asignación de miembros y flujos colaborativos en tiempo real.</p>
+          <div class="pcard-stack">
             <span class="skill-pill">React</span>
-            <span class="skill-pill">Angular</span>
-            <span class="skill-pill">Tailwind CSS</span>
-          </div>
-        </div>
-        <div class="mb-10">
-          <div class="mono mb-4">Backend</div>
-          <div class="flex flex-wrap gap-2">
             <span class="skill-pill">Node.js</span>
             <span class="skill-pill">Express</span>
-            <span class="skill-pill">Django</span>
-            <span class="skill-pill">Spring Boot</span>
-            <span class="skill-pill">REST APIs</span>
+          </div>
+          <div class="pcard-footer">
+            <a href="https://trello-app-frontend-seven.vercel.app/" target="_blank" rel="noopener" class="link-arrow">Ver demo →</a>
+            <span class="mono" style="color:#333">2025</span>
           </div>
         </div>
-        <div>
-          <div class="mono mb-4">Herramientas</div>
-          <div class="flex flex-wrap gap-2">
-            <span class="skill-pill">Git</span>
-            <span class="skill-pill">Docker</span>
-            <span class="skill-pill">Python</span>
-            <span class="skill-pill">Java</span>
-            <span class="skill-pill">Jira</span>
-            <span class="skill-pill">QA Testing</span>
-          </div>
-        </div>
+      </div>
 
-        <!-- Download CV -->
-        <div class="mt-10 p-5 border border-gray-800 rounded-lg flex items-center justify-between">
+      <!-- ── 03 SistemaAsistencia ── -->
+      <div class="pcard" onmousemove="gm(event,this)">
+        <div class="pcard-browser">
+          <div class="browser-chrome">
+            <div class="bdot bdot-r"></div><div class="bdot bdot-y"></div><div class="bdot bdot-g"></div>
+            <div class="burl">nuevo-mike-5l2r-git-main-juabngon…</div>
+          </div>
+          <div class="pcard-img-wrap">
+            <img
+              id="img-sa"
+              src="https://api.microlink.io/?url=https://nuevo-mike-5l2r-git-main-juabngonzalez4-gmailcoms-projects.vercel.app/&screenshot=true&meta=false&embed=screenshot.url"
+              alt="SistemaAsistencia"
+              onerror="this.style.display='none';document.getElementById('fb-sa').style.display='flex'"
+            />
+            <div id="fb-sa" class="img-fallback" style="display:none">
+              <span class="mono" style="opacity:.2">preview</span>
+            </div>
+            <span class="pcard-num">03</span>
+          </div>
+        </div>
+        <div class="pcard-body">
+          <div class="pcard-top">
+            <span class="tag">Gestión Escolar</span>
+            <span class="live-dot">Live</span>
+          </div>
+          <h3 class="pcard-title">SistemaAsistencia</h3>
+          <p class="pcard-desc">Sistema escolar con control de asistencia, administración de alumnos, grupos y reportes por periodo.</p>
+          <div class="pcard-stack">
+            <span class="skill-pill">Angular</span>
+            <span class="skill-pill">Node.js</span>
+            <span class="skill-pill">Express</span>
+          </div>
+          <div class="pcard-footer">
+            <a href="https://nuevo-mike-5l2r-git-main-juabngonzalez4-gmailcoms-projects.vercel.app/" target="_blank" rel="noopener" class="link-arrow">Ver proyecto →</a>
+            <span class="mono" style="color:#333">2025</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <!-- end grid -->
+
+  </section>
+
+  <!-- SOBRE MÍ -->
+  <section id="sobre-mi" style="max-width:1280px;margin:0 auto;padding:80px 24px">
+    <div class="section-label reveal"><span class="mono acid">02</span><span class="mono">Sobre mí</span></div>
+    <div class="about-grid reveal">
+      <div>
+        <h2 style="font-size:clamp(2rem,4vw,3.4rem);font-weight:800;letter-spacing:-.025em;margin-bottom:24px;line-height:1.08">
+          Hola, soy<br/><span class="acid">Juan Carlos</span><br/>González López
+        </h2>
+        <p style="color:#666;line-height:1.8;margin-bottom:18px;font-size:.95rem">Desarrollador Full-Stack con experiencia construyendo proyectos en producción. Domino el ciclo completo — del frontend al backend — con enfoque práctico adquirido en entorno académico.</p>
+        <p style="color:#666;line-height:1.8;margin-bottom:36px;font-size:.95rem">Soy de Los Mochis, Sinaloa. También tengo experiencia en <span class="acid">QA</span> gestionando pruebas y bugs con Jira.</p>
+        <div class="timeline" style="padding-left:20px;display:flex;flex-direction:column;gap:24px">
           <div>
-            <div class="font-semibold">Currículum Vitae</div>
-            <div class="text-gray-500 text-sm mt-0.5">PDF · Actualizado 2025</div>
+            <div class="mono acid" style="margin-bottom:4px">Proyectos personales</div>
+            <div style="font-weight:700;margin-bottom:4px">Full-Stack Developer</div>
+            <div style="color:#555;font-size:.87rem;line-height:1.65">RedStudent, Trinoflow, SistemaAsistencia — 3 apps completas en producción.</div>
           </div>
-          <a href="#" class="acid-bg px-4 py-2 rounded text-xs font-bold tracking-wider hover:opacity-90 transition-opacity">
-            Descargar
-          </a>
+          <div>
+            <div class="mono acid" style="margin-bottom:4px">QA</div>
+            <div style="font-weight:700;margin-bottom:4px">Quality Assurance con Jira</div>
+            <div style="color:#555;font-size:.87rem;line-height:1.65">Gestión de casos de prueba, reporte y seguimiento de bugs.</div>
+          </div>
+          <div>
+            <div class="mono acid" style="margin-bottom:4px">Formación</div>
+            <div style="font-weight:700;margin-bottom:4px">Ingeniería de Software</div>
+            <div style="color:#555;font-size:.87rem;line-height:1.65">Algoritmos, bases de datos, arquitectura de software y desarrollo web.</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div style="margin-bottom:26px"><div class="mono" style="margin-bottom:10px">Frontend</div><div style="display:flex;flex-wrap:wrap;gap:7px"><span class="skill-pill">HTML / CSS</span><span class="skill-pill">JavaScript</span><span class="skill-pill">React</span><span class="skill-pill">Angular</span><span class="skill-pill">Tailwind CSS</span></div></div>
+        <div style="margin-bottom:26px"><div class="mono" style="margin-bottom:10px">Backend</div><div style="display:flex;flex-wrap:wrap;gap:7px"><span class="skill-pill">Node.js</span><span class="skill-pill">Express</span><span class="skill-pill">Django</span><span class="skill-pill">Spring Boot</span><span class="skill-pill">REST APIs</span></div></div>
+        <div style="margin-bottom:32px"><div class="mono" style="margin-bottom:10px">Herramientas</div><div style="display:flex;flex-wrap:wrap;gap:7px"><span class="skill-pill">Git</span><span class="skill-pill">Docker</span><span class="skill-pill">Python</span><span class="skill-pill">Java</span><span class="skill-pill">Jira</span><span class="skill-pill">QA Testing</span></div></div>
+        <div style="padding:18px 20px;border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-weight:700;margin-bottom:3px">Currículum Vitae</div>
+            <div style="color:#444;font-size:.85rem">PDF · Actualizado 2025</div>
+          </div>
+          <a href="#" class="acid-bg" style="padding:9px 16px;border-radius:6px;font-size:.72rem;font-weight:700;letter-spacing:.07em;text-decoration:none">Descargar</a>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ──────── SERVICES ──────── -->
-  <section class="max-w-7xl mx-auto px-6 py-16">
-    <div class="section-label reveal">
-      <span class="mono acid">03</span>
-      <span class="mono">Servicios</span>
-    </div>
-
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-
-      <div class="project-card p-8 rounded-lg reveal" onmousemove="trackMouse(event,this)">
-        <div class="text-3xl mb-4">⬡</div>
-        <h3 class="text-xl font-bold mb-3">Desarrollo Frontend</h3>
-        <p class="text-gray-500 leading-relaxed text-sm">Interfaces modernas con React, Angular o HTML Vanilla. Rápidas, responsivas y con excelente UX.</p>
-      </div>
-
-      <div class="project-card p-8 rounded-lg reveal" onmousemove="trackMouse(event,this)">
-        <div class="text-3xl mb-4">◈</div>
-        <h3 class="text-xl font-bold mb-3">APIs & Backend</h3>
-        <p class="text-gray-500 leading-relaxed text-sm">Backends robustos con Node/Express, Django o Spring Boot. Arquitecturas limpias y bien documentadas.</p>
-      </div>
-
-      <div class="project-card p-8 rounded-lg reveal" onmousemove="trackMouse(event,this)">
-        <div class="text-3xl mb-4">◎</div>
-        <h3 class="text-xl font-bold mb-3">Aplicaciones Full-Stack</h3>
-        <p class="text-gray-500 leading-relaxed text-sm">Desarrollo end-to-end: desde la base de datos hasta la interfaz. Un solo desarrollador, producto completo.</p>
-      </div>
-
+  <!-- SERVICIOS -->
+  <section style="max-width:1280px;margin:0 auto;padding:20px 24px 80px">
+    <div class="section-label reveal"><span class="mono acid">03</span><span class="mono">Servicios</span></div>
+    <div class="srv-grid reveal">
+      <div class="srv-card"><div style="font-size:1.3rem;margin-bottom:13px;opacity:.5">⬡</div><h3 style="font-size:1rem;font-weight:700;margin-bottom:9px">Desarrollo Frontend</h3><p style="color:#555;font-size:.87rem;line-height:1.65">Interfaces modernas con React, Angular o HTML Vanilla. Rápidas, responsivas y con excelente UX.</p></div>
+      <div class="srv-card"><div style="font-size:1.3rem;margin-bottom:13px;opacity:.5">◈</div><h3 style="font-size:1rem;font-weight:700;margin-bottom:9px">APIs & Backend</h3><p style="color:#555;font-size:.87rem;line-height:1.65">Backends robustos con Node/Express, Django o Spring Boot. Arquitecturas limpias y documentadas.</p></div>
+      <div class="srv-card"><div style="font-size:1.3rem;margin-bottom:13px;opacity:.5">◎</div><h3 style="font-size:1rem;font-weight:700;margin-bottom:9px">Aplicaciones Full-Stack</h3><p style="color:#555;font-size:.87rem;line-height:1.65">Desarrollo end-to-end: base de datos hasta interfaz. Un solo desarrollador, producto completo.</p></div>
     </div>
   </section>
 
-
-  <!-- ──────── FOOTER ──────── -->
-  <footer class="border-t border-gray-800 px-6 py-8">
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-      <span class="mono opacity-40">© 2025 Juan Carlos González López. Diseñado & construido con ☕</span>
-      <span class="mono opacity-40">Los Mochis, México</span>
+  <!-- FOOTER -->
+  <footer style="border-top:1px solid var(--border);padding:24px">
+    <div style="max-width:1280px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center">
+      <span class="mono" style="opacity:.22">© 2025 Juan Carlos González López — diseñado & construido con ☕</span>
+      <span class="mono" style="opacity:.14">Los Mochis, México</span>
     </div>
   </footer>
 
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-    // ── Custom cursor ──
-    const cursor = document.getElementById('cursor');
+  <script>
+    const cur = document.getElementById('cursor');
     const ring = document.getElementById('cursorRing');
-    let rx = 0, ry = 0;
-
     document.addEventListener('mousemove', e => {
-      cursor.style.left = e.clientX + 'px';
-      cursor.style.top = e.clientY + 'px';
-      setTimeout(() => {
-        ring.style.left = e.clientX + 'px';
-        ring.style.top = e.clientY + 'px';
-      }, 60);
+      cur.style.left = e.clientX+'px'; cur.style.top = e.clientY+'px';
+      setTimeout(()=>{ ring.style.left = e.clientX+'px'; ring.style.top = e.clientY+'px'; }, 55);
+    });
+    document.querySelectorAll('a,button').forEach(el => {
+      el.addEventListener('mouseenter',()=>{ cur.style.width='18px'; cur.style.height='18px'; ring.style.width='52px'; ring.style.height='52px'; });
+      el.addEventListener('mouseleave',()=>{ cur.style.width='10px'; cur.style.height='10px'; ring.style.width='36px'; ring.style.height='36px'; });
     });
 
-    document.querySelectorAll('a, button, input, textarea').forEach(el => {
-      el.addEventListener('mouseenter', () => {
-        cursor.style.width = '20px';
-        cursor.style.height = '20px';
-        ring.style.width = '60px';
-        ring.style.height = '60px';
-      });
-      el.addEventListener('mouseleave', () => {
-        cursor.style.width = '12px';
-        cursor.style.height = '12px';
-        ring.style.width = '40px';
-        ring.style.height = '40px';
-      });
-    });
-
-    // ── Mouse glow on cards ──
-    function trackMouse(e, el) {
+    function gm(e, el) {
       const r = el.getBoundingClientRect();
-      el.style.setProperty('--mx', (e.clientX - r.left) + 'px');
-      el.style.setProperty('--my', (e.clientY - r.top) + 'px');
+      el.style.setProperty('--mx', (e.clientX - r.left)+'px');
+      el.style.setProperty('--my', (e.clientY - r.top)+'px');
     }
 
-    // ── Scroll reveal ──
     const obs = new IntersectionObserver(entries => {
-      entries.forEach((e, i) => {
-        if (e.isIntersecting) {
-          setTimeout(() => e.target.classList.add('visible'), i * 80);
-          obs.unobserve(e.target);
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => entry.target.classList.add('visible'), i * 80);
+          obs.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.1 });
-
+    }, { threshold: 0.06 });
     document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
-    // Form submit
-    function handleSubmit(e) {
-      e.preventDefault();
-      const msg = document.getElementById('form-msg');
-      msg.classList.remove('hidden');
-      e.target.reset();
-      setTimeout(() => msg.classList.add('hidden'), 5000);
-    }
-
-    // Active nav highlight
-    const sections = document.querySelectorAll('section[id]');
-    const navLinks = document.querySelectorAll('nav a[href^="#"]');
-    const navObs = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          navLinks.forEach(link => {
-            link.style.color = link.getAttribute('href') === '#' + entry.target.id ? 'var(--acid)' : '';
-          });
-        }
-      });
-    }, { rootMargin: '-40% 0px -55% 0px' });
-    sections.forEach(s => navObs.observe(s));
-
-    // Parallax hero
+    const sc = document.getElementById('sc');
     const heroTitle = document.querySelector('.hero-title');
     window.addEventListener('scroll', () => {
-      if (heroTitle) {
+      if(sc) sc.style.opacity = window.scrollY > 60 ? '0' : '1';
+      if(heroTitle){
         const y = window.scrollY;
-        heroTitle.style.transform = 'translateY(' + (y * 0.18) + 'px)';
-        heroTitle.style.opacity = Math.max(0, 1 - y / 500);
+        heroTitle.style.transform = 'translateY('+(y*.12)+'px)';
+        heroTitle.style.opacity = Math.max(0, 1 - y/480);
       }
-    }, { passive: true });
+    }, {passive:true});
   </script>
 </body>
 </html>
