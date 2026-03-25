@@ -76,16 +76,6 @@
     @media(max-width:900px) { .projects-grid { grid-template-columns: repeat(2, 1fr); } }
     @media(max-width:560px) { .projects-grid { grid-template-columns: 1fr; } }
 
-    /* divider between cards */
-    .projects-grid > * + * { border-left: none; }
-    @media(max-width:900px) {
-      .projects-grid > *:nth-child(2n+1) { border-left: none; }
-      .projects-grid > *:nth-child(n+3) { border-top: none; }
-    }
-    @media(max-width:560px) {
-      .projects-grid > * + * { border-left: none; border-top: none; }
-    }
-
     .pcard {
       position: relative;
       background: var(--surface);
@@ -98,7 +88,6 @@
     }
     .pcard:hover { background: var(--surface2); }
 
-    /* glow follow mouse */
     .pcard::before {
       content: '';
       position: absolute; inset: 0; pointer-events: none; z-index: 0;
@@ -107,7 +96,6 @@
     }
     .pcard:hover::before { opacity: 1; }
 
-    /* browser mockup */
     .pcard-browser {
       position: relative;
       background: #0c0c0c;
@@ -154,7 +142,6 @@
       pointer-events: none;
     }
 
-    /* number watermark */
     .pcard-num {
       position: absolute; bottom: 8px; right: 12px;
       font-family: 'DM Mono', monospace;
@@ -163,7 +150,6 @@
       pointer-events: none; user-select: none; z-index: 1;
     }
 
-    /* shimmer fallback */
     .img-fallback {
       width: 100%; height: 100%;
       background: linear-gradient(135deg, #131313 0%, #1d1d1d 50%, #131313 100%);
@@ -213,7 +199,6 @@
       margin-top: auto;
     }
 
-    /* about / services */
     .about-grid { display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start; }
     @media(max-width:768px){.about-grid{grid-template-columns:1fr}}
     .srv-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:14px; }
@@ -268,22 +253,22 @@
   <!-- MARQUEE -->
   <div style="overflow:hidden;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:9px 0">
     <div class="marquee-track">
-      <span class="mono" style="padding:0 24px;opacity:.3">React</span><span class="mono acid" style="padding:0 4px">✦</span>
       <span class="mono" style="padding:0 24px;opacity:.3">Angular</span><span class="mono acid" style="padding:0 4px">✦</span>
       <span class="mono" style="padding:0 24px;opacity:.3">Node.js</span><span class="mono acid" style="padding:0 4px">✦</span>
       <span class="mono" style="padding:0 24px;opacity:.3">Express</span><span class="mono acid" style="padding:0 4px">✦</span>
+      <span class="mono" style="padding:0 24px;opacity:.3">MySQL</span><span class="mono acid" style="padding:0 4px">✦</span>
+      <span class="mono" style="padding:0 24px;opacity:.3">React</span><span class="mono acid" style="padding:0 4px">✦</span>
       <span class="mono" style="padding:0 24px;opacity:.3">Django</span><span class="mono acid" style="padding:0 4px">✦</span>
       <span class="mono" style="padding:0 24px;opacity:.3">Spring Boot</span><span class="mono acid" style="padding:0 4px">✦</span>
-      <span class="mono" style="padding:0 24px;opacity:.3">MySQL</span><span class="mono acid" style="padding:0 4px">✦</span>
       <span class="mono" style="padding:0 24px;opacity:.3">Socket.io</span><span class="mono acid" style="padding:0 4px">✦</span>
       <span class="mono" style="padding:0 24px;opacity:.3">Python</span><span class="mono acid" style="padding:0 4px">✦</span>
-      <span class="mono" style="padding:0 24px;opacity:.3">React</span><span class="mono acid" style="padding:0 4px">✦</span>
       <span class="mono" style="padding:0 24px;opacity:.3">Angular</span><span class="mono acid" style="padding:0 4px">✦</span>
       <span class="mono" style="padding:0 24px;opacity:.3">Node.js</span><span class="mono acid" style="padding:0 4px">✦</span>
       <span class="mono" style="padding:0 24px;opacity:.3">Express</span><span class="mono acid" style="padding:0 4px">✦</span>
+      <span class="mono" style="padding:0 24px;opacity:.3">MySQL</span><span class="mono acid" style="padding:0 4px">✦</span>
+      <span class="mono" style="padding:0 24px;opacity:.3">React</span><span class="mono acid" style="padding:0 4px">✦</span>
       <span class="mono" style="padding:0 24px;opacity:.3">Django</span><span class="mono acid" style="padding:0 4px">✦</span>
       <span class="mono" style="padding:0 24px;opacity:.3">Spring Boot</span><span class="mono acid" style="padding:0 4px">✦</span>
-      <span class="mono" style="padding:0 24px;opacity:.3">MySQL</span><span class="mono acid" style="padding:0 4px">✦</span>
       <span class="mono" style="padding:0 24px;opacity:.3">Socket.io</span><span class="mono acid" style="padding:0 4px">✦</span>
       <span class="mono" style="padding:0 24px;opacity:.3">Python</span><span class="mono acid" style="padding:0 4px">✦</span>
     </div>
@@ -304,7 +289,6 @@
       <span class="mono" style="color:#333;padding-bottom:8px">3 proyectos en producción</span>
     </div>
 
-    <!-- ═══ THE 3-COLUMN GRID ═══ -->
     <div class="projects-grid reveal">
 
       <!-- ── 01 RedStudent ── -->
@@ -337,8 +321,8 @@
           <div class="pcard-stack">
             <span class="skill-pill">Angular</span>
             <span class="skill-pill">Node.js</span>
+            <span class="skill-pill">Express</span>
             <span class="skill-pill">MySQL</span>
-            <span class="skill-pill">Socket.io</span>
           </div>
           <div class="pcard-footer">
             <a href="https://computo-en-la-nube2-dusky.vercel.app/" target="_blank" rel="noopener" class="link-arrow">Ver demo →</a>
@@ -375,9 +359,10 @@
           <h3 class="pcard-title">Trinoflow</h3>
           <p class="pcard-desc">Gestión de tareas estilo Trello. Tableros personalizables, tarjetas drag &amp; drop, asignación de miembros y flujos colaborativos en tiempo real.</p>
           <div class="pcard-stack">
-            <span class="skill-pill">React</span>
+            <span class="skill-pill">Angular</span>
             <span class="skill-pill">Node.js</span>
             <span class="skill-pill">Express</span>
+            <span class="skill-pill">MySQL</span>
           </div>
           <div class="pcard-footer">
             <a href="https://trello-app-frontend-seven.vercel.app/" target="_blank" rel="noopener" class="link-arrow">Ver demo →</a>
@@ -417,6 +402,7 @@
             <span class="skill-pill">Angular</span>
             <span class="skill-pill">Node.js</span>
             <span class="skill-pill">Express</span>
+            <span class="skill-pill">MySQL</span>
           </div>
           <div class="pcard-footer">
             <a href="https://nuevo-mike-5l2r-git-main-juabngonzalez4-gmailcoms-projects.vercel.app/" target="_blank" rel="noopener" class="link-arrow">Ver proyecto →</a>
@@ -426,8 +412,6 @@
       </div>
 
     </div>
-    <!-- end grid -->
-
   </section>
 
   <!-- SOBRE MÍ -->
@@ -461,6 +445,7 @@
       <div>
         <div style="margin-bottom:26px"><div class="mono" style="margin-bottom:10px">Frontend</div><div style="display:flex;flex-wrap:wrap;gap:7px"><span class="skill-pill">HTML / CSS</span><span class="skill-pill">JavaScript</span><span class="skill-pill">React</span><span class="skill-pill">Angular</span><span class="skill-pill">Tailwind CSS</span></div></div>
         <div style="margin-bottom:26px"><div class="mono" style="margin-bottom:10px">Backend</div><div style="display:flex;flex-wrap:wrap;gap:7px"><span class="skill-pill">Node.js</span><span class="skill-pill">Express</span><span class="skill-pill">Django</span><span class="skill-pill">Spring Boot</span><span class="skill-pill">REST APIs</span></div></div>
+        <div style="margin-bottom:26px"><div class="mono" style="margin-bottom:10px">Base de datos</div><div style="display:flex;flex-wrap:wrap;gap:7px"><span class="skill-pill">MySQL</span><span class="skill-pill">MongoDB</span><span class="skill-pill">SQL Server</span><span class="skill-pill">SQLite</span></div></div>
         <div style="margin-bottom:32px"><div class="mono" style="margin-bottom:10px">Herramientas</div><div style="display:flex;flex-wrap:wrap;gap:7px"><span class="skill-pill">Git</span><span class="skill-pill">Docker</span><span class="skill-pill">Python</span><span class="skill-pill">Java</span><span class="skill-pill">Jira</span><span class="skill-pill">QA Testing</span></div></div>
         <div style="padding:18px 20px;border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;justify-content:space-between">
           <div>
@@ -477,9 +462,9 @@
   <section style="max-width:1280px;margin:0 auto;padding:20px 24px 80px">
     <div class="section-label reveal"><span class="mono acid">03</span><span class="mono">Servicios</span></div>
     <div class="srv-grid reveal">
-      <div class="srv-card"><div style="font-size:1.3rem;margin-bottom:13px;opacity:.5">⬡</div><h3 style="font-size:1rem;font-weight:700;margin-bottom:9px">Desarrollo Frontend</h3><p style="color:#555;font-size:.87rem;line-height:1.65">Interfaces modernas con React, Angular o HTML Vanilla. Rápidas, responsivas y con excelente UX.</p></div>
-      <div class="srv-card"><div style="font-size:1.3rem;margin-bottom:13px;opacity:.5">◈</div><h3 style="font-size:1rem;font-weight:700;margin-bottom:9px">APIs & Backend</h3><p style="color:#555;font-size:.87rem;line-height:1.65">Backends robustos con Node/Express, Django o Spring Boot. Arquitecturas limpias y documentadas.</p></div>
-      <div class="srv-card"><div style="font-size:1.3rem;margin-bottom:13px;opacity:.5">◎</div><h3 style="font-size:1rem;font-weight:700;margin-bottom:9px">Aplicaciones Full-Stack</h3><p style="color:#555;font-size:.87rem;line-height:1.65">Desarrollo end-to-end: base de datos hasta interfaz. Un solo desarrollador, producto completo.</p></div>
+      <div class="srv-card"><div style="font-size:1.3rem;margin-bottom:13px;opacity:.5">⬡</div><h3 style="font-size:1rem;font-weight:700;margin-bottom:9px">Desarrollo Frontend</h3><p style="color:#555;font-size:.87rem;line-height:1.65">Interfaces modernas con React o Angular. Rápidas, responsivas y con excelente UX.</p></div>
+      <div class="srv-card"><div style="font-size:1.3rem;margin-bottom:13px;opacity:.5">◈</div><h3 style="font-size:1rem;font-weight:700;margin-bottom:9px">APIs & Backend</h3><p style="color:#555;font-size:.87rem;line-height:1.65">Backends robustos con Node/Express. Base de datos MySQL. Arquitecturas limpias y documentadas.</p></div>
+      <div class="srv-card"><div style="font-size:1.3rem;margin-bottom:13px;opacity:.5">◎</div><h3 style="font-size:1rem;font-weight:700;margin-bottom:9px">Aplicaciones Full-Stack</h3><p style="color:#555;font-size:.87rem;line-height:1.65">Desarrollo end-to-end: MySQL hasta interfaz Angular. Un solo desarrollador, producto completo.</p></div>
     </div>
   </section>
 
